@@ -1,12 +1,12 @@
-# Build stage - use Java 17
-FROM maven:3.9.6-eclipse-temurin-17-jammy AS build
+# Build stage - use Java 17 to match your pom.xml
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Runtime stage - can use Java 11 or 17 (11 is lighter)
+# Runtime stage
 FROM eclipse-temurin:11-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
