@@ -1,12 +1,14 @@
-FROM maven:3.9-eclipse-temurin-11 AS build
+# Build stage - use Java 17
+FROM maven:3.9.6-eclipse-temurin-17-jammy AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
 COPY . .
 RUN mvn clean package -DskipTests
 
+# Runtime stage - can use Java 11 or 17 (11 is lighter)
 FROM eclipse-temurin:11-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
